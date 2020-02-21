@@ -1,23 +1,3 @@
-/**
- * chariot-tooltips v1.0.3 - A JavaScript library for creating beautiful in product tutorials
- *
- * https://github.com/zendesk/chariot-tooltips
- *
- * Copyright 2016 Zendesk Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-
- */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.chariot = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -626,9 +606,6 @@ var Step = function () {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var index = arguments[1];
     var tutorial = arguments[2];
-
-    var _this = this;
-
     var overlay = arguments[3];
     var delegate = arguments[4];
 
@@ -649,13 +626,11 @@ var Step = function () {
       }
       this.selectors = config.selectors;
     } else if (Array.isArray(config.selectors)) {
-      (function () {
-        var selectorsMap = {};
-        config.selectors.forEach(function (val, idx) {
-          selectorsMap[idx] = val;
-        });
-        _this.selectors = selectorsMap;
-      })();
+      var selectorsMap = {};
+      config.selectors.forEach(function (val, idx) {
+        selectorsMap[idx] = val;
+      });
+      this.selectors = selectorsMap;
     } else {
       throw new Error('selectors must be an object, array, or string');
     }
@@ -673,79 +648,97 @@ var Step = function () {
   _createClass(Step, [{
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this = this;
 
       Promise.resolve().then(function () {
-        if (_this2.delegate.willBeginStep) {
-          return _this2.delegate.willBeginStep(_this2, _this2.index, _this2.tutorial);
+        if (_this.delegate.willBeginStep) {
+          return _this.delegate.willBeginStep(_this, _this.index, _this.tutorial);
         }
       }).then(function () {
-        if (_this2.delegate.willShowOverlay) {
-          return _this2.delegate.willShowOverlay(_this2.overlay, _this2.index, _this2.tutorial);
+        if (_this.delegate.willShowOverlay) {
+          return _this.delegate.willShowOverlay(_this.overlay, _this.index, _this.tutorial);
         }
       }).then(function () {
         // Show a temporary background overlay while we wait for elements
-        _this2.overlay.showBackgroundOverlay();
-        return _this2._waitForElements();
+        _this.overlay.showBackgroundOverlay();
+        return _this._waitForElements();
       }).then(function () {
         // Render the overlay
-        if (_this2.overlay.isTransparentOverlayStrategy() && Object.keys(_this2.selectors).length === 1) {
-          _this2._singleTransparentOverlayStrategy();
+        if (_this.overlay.isTransparentOverlayStrategy() && Object.keys(_this.selectors).length === 1) {
+          _this._singleTransparentOverlayStrategy();
         } else {
-          _this2._clonedElementStrategy();
+          _this._clonedElementStrategy();
         }
       }).then(function () {
-        if (_this2.delegate.didShowOverlay) {
-          return _this2.delegate.didShowOverlay(_this2.overlay, _this2.index, _this2.tutorial);
+        if (_this.delegate.didShowOverlay) {
+          return _this.delegate.didShowOverlay(_this.overlay, _this.index, _this.tutorial);
         }
       }).then(function () {
-        if (_this2.delegate.willRenderTooltip) {
-          return _this2.delegate.willRenderTooltip(_this2.tooltip, _this2.index, _this2.tutorial);
+        if (_this.delegate.willRenderTooltip) {
+          return _this.delegate.willRenderTooltip(_this.tooltip, _this.index, _this.tutorial);
         }
       }).then(function () {
-        _this2._renderTooltip();
-        if (_this2.delegate.didRenderTooltip) {
-          return _this2.delegate.didRenderTooltip(_this2.tooltip, _this2.index, _this2.tutorial);
+        _this._renderTooltip();
+        if (_this.delegate.didRenderTooltip) {
+          return _this.delegate.didRenderTooltip(_this.tooltip, _this.index, _this.tutorial);
         }
       }).then(function () {
         // Resize the overlay in case the tooltip extended the width/height of DOM
-        _this2.overlay.resize();
+        _this.overlay.resize();
 
         // Setup resize handler
-        _this2._resizeHandler = (0, _lodash2.default)(function () {
-          for (var selectorName in _this2.selectors) {
-            var elementInfo = _this2._elementMap[selectorName];
+        _this._resizeHandler = (0, _lodash2.default)(function () {
+          for (var selectorName in _this.selectors) {
+            var elementInfo = _this._elementMap[selectorName];
             if (elementInfo.clone) {
               var $element = elementInfo.element;
               var $clone = elementInfo.clone;
               _style2.default.clearCachedStylesForElement($element);
-              _this2._applyComputedStyles($clone, $element);
-              _this2._positionClone($clone, $element);
+              _this._applyComputedStyles($clone, $element);
+              _this._positionClone($clone, $element);
             }
           }
-          _this2.tooltip.reposition();
-          _this2.overlay.resize();
+          _this.tooltip.reposition();
+          _this.overlay.resize();
         }, 50);
-        $(window).on('resize', _this2._resizeHandler);
+        $(window).on('resize', _this._resizeHandler);
       }).catch(function (error) {
         console.log(error);
-        _this2.tutorial.tearDown();
+        _this.tutorial.tearDown();
+      });
+    }
+  }, {
+    key: '_moveTo',
+    value: function _moveTo(action) {
+      var _this2 = this;
+
+      Promise.resolve().then(function () {
+        if (_this2.delegate.didFinishStep) {
+          return _this2.delegate.didFinishStep(_this2, _this2.index, _this2.tutorial);
+        }
+      }).then(function () {
+        action();
+      }).catch(function (error) {
+        console.log(error);
+        action();
+      });
+    }
+  }, {
+    key: 'previous',
+    value: function previous() {
+      var _this3 = this;
+
+      this._moveTo(function () {
+        return _this3.tutorial.next(_this3.index - 1);
       });
     }
   }, {
     key: 'next',
     value: function next() {
-      var _this3 = this;
+      var _this4 = this;
 
-      Promise.resolve().then(function () {
-        if (_this3.delegate.didFinishStep) {
-          return _this3.delegate.didFinishStep(_this3, _this3.index, _this3.tutorial);
-        }
-      }).then(function () {
-        _this3.tutorial.next();
-      }).catch(function (error) {
-        console.log(error);
-        _this3.tutorial.next();
+      this._moveTo(function () {
+        return _this4.tutorial.next();
       });
     }
   }, {
@@ -818,13 +811,13 @@ var Step = function () {
   }, {
     key: '_waitForElements',
     value: function _waitForElements() {
-      var _this4 = this;
+      var _this5 = this;
 
       var promises = [];
 
       var _loop = function _loop(selectorName) {
         var promise = new Promise(function (resolve, reject) {
-          _this4._waitForElement(selectorName, 0, resolve, reject);
+          _this5._waitForElement(selectorName, 0, resolve, reject);
         });
         promises.push(promise);
       };
@@ -838,7 +831,7 @@ var Step = function () {
   }, {
     key: '_waitForElement',
     value: function _waitForElement(selectorName, numAttempts, resolve, reject) {
-      var _this5 = this;
+      var _this6 = this;
 
       var selector = this.selectors[selectorName];
       var element = $(selector);
@@ -848,7 +841,7 @@ var Step = function () {
           reject('Selector not found: ' + selector);
         } else {
           window.setTimeout(function () {
-            _this5._waitForElement(selectorName, numAttempts, resolve, reject);
+            _this6._waitForElement(selectorName, numAttempts, resolve, reject);
           }, DOM_QUERY_DELAY);
         }
       } else {
@@ -862,22 +855,22 @@ var Step = function () {
   }, {
     key: '_computeStyles',
     value: function _computeStyles($element) {
-      var _this6 = this;
+      var _this7 = this;
 
       _style2.default.getComputedStylesFor($element[0]);
       $element.children().toArray().forEach(function (child) {
-        _this6._computeStyles($(child));
+        _this7._computeStyles($(child));
       });
     }
   }, {
     key: '_cloneElements',
     value: function _cloneElements(selectors) {
-      var _this7 = this;
+      var _this8 = this;
 
       if (this.overlay.isVisible()) return;
 
       setTimeout(function () {
-        _this7.tutorial.prepare();
+        _this8.tutorial.prepare();
       }, 0);
       for (var selectorName in selectors) {
         var clone = this._cloneElement(selectorName);
@@ -902,7 +895,7 @@ var Step = function () {
   }, {
     key: '_applyComputedStyles',
     value: function _applyComputedStyles($clone, $element) {
-      var _this8 = this;
+      var _this9 = this;
 
       if (!$element.is(":visible")) {
         return;
@@ -914,7 +907,7 @@ var Step = function () {
       }
       var clonedChildren = $clone.children().toArray();
       $element.children().toArray().forEach(function (child, index) {
-        _this8._applyComputedStyles($(clonedChildren[index]), $(child));
+        _this9._applyComputedStyles($(clonedChildren[index]), $(child));
       });
     }
   }, {
@@ -934,7 +927,7 @@ var Step = function () {
 exports.default = Step;
 module.exports = exports['default'];
 
-},{"./constants":2,"./style":6,"./tooltip":7,"es6-promise":10,"lodash.debounce":11}],6:[function(require,module,exports){
+},{"./constants":2,"./style":6,"./tooltip":7,"es6-promise":9,"lodash.debounce":11}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1142,7 +1135,8 @@ var DEFAULT_ARROW_LENGTH = 11;
  * @property {string} [title] - The title text of a toolip.
  * @property {string|function} [body] - The body text of a tooltip, or a callback
  *  that returns custom HTML.
- * @property {string} [cta] - The text contained within the button.
+ * @property {string} [ctaPrevious] - The text contained within the previous button.
+ * @property {string} [ctaNext] - The text contained within the next button.
  * @property {Object} [attr] - HTML attributes to set on the tooltip.
  * @property {Number} [arrowLength] - Distance between arrow tip and edge of
  *  tooltip, not including border.  A value of 0 removes the arrow.
@@ -1242,8 +1236,8 @@ var Tooltip = function () {
       this._position($tooltip, $tooltipArrow);
 
       // Add button event handler
-      $('.chariot-btn-row button').click(function () {
-        _this._animateTooltipDisappear($tooltip);
+      $('.chariot-btn-row button').click(function (event) {
+        _this._animateTooltipDisappear($tooltip, $(event.target).hasClass('btn-next'));
       });
     }
   }, {
@@ -1273,13 +1267,15 @@ var Tooltip = function () {
     value: function _createTooltipTemplate() {
       var currentStep = this.currentStepNum();
       var totalSteps = this.tutorial.steps.length;
-      this.cta = this.config.cta || (currentStep != totalSteps ? 'Next' : 'Done');
+      this.ctaPrevious = this.config.ctaPrevious || 'Prev';
+      this.ctaNext = this.config.ctaNext || (currentStep != totalSteps ? 'Next' : 'Done');
       this.subtext = this.config.subtext || function () {
         return currentStep + ' of ' + totalSteps;
       };
       var subtextMarkup = this._subtextMarkup();
-      var buttonFloat = subtextMarkup === '' ? 'center' : 'right';
-      var template = '\n      <div class="' + this._classNames() + '">\n        ' + this._arrowMarkup() + '\n        <div class="chariot-tooltip-content">' + this._iconMarkup() + '</div>\n        <h1 class="chariot-tooltip-header">' + this.title + '</h1>\n        <div class="chariot-tooltip-content"><p>' + this.text + '</p></div>\n        <div class="chariot-btn-row">\n          ' + subtextMarkup + '\n          <button class="btn btn-inverse ' + buttonFloat + '">' + this.cta + '</button>\n        </div>\n      </div>';
+      var buttonsMarkup = this._buttonsMarkup(subtextMarkup === '');
+
+      var template = '\n      <div class="' + this._classNames() + '">\n        ' + this._arrowMarkup() + '\n        <div class="chariot-tooltip-content">' + this._iconMarkup() + '</div>\n        <h1 class="chariot-tooltip-header">' + this.title + '</h1>\n        <div class="chariot-tooltip-content"><p>' + this.text + '</p></div>\n        <div class="chariot-btn-row">\n          ' + subtextMarkup + '\n          ' + buttonsMarkup + '\n        </div>\n      </div>';
       var $template = $(template);
 
       // Add default data attributes
@@ -1306,6 +1302,18 @@ var Tooltip = function () {
     value: function _subtextMarkup() {
       if (!this.subtext) return '';
       return '<span class=\'chariot-tooltip-subtext\'>\n      ' + this.subtext(this.currentStepNum(), this.tutorial.steps.length) + '\n    </span>';
+    }
+  }, {
+    key: '_buttonsMarkup',
+    value: function _buttonsMarkup(centered) {
+      var buttonFloat = centered ? 'center' : 'right';
+      var buttons = ['<button class="btn btn-inverse btn-next ' + buttonFloat + '">' + this.ctaNext + '</button>'];
+      if (this.currentStepNum() === 1){
+        buttons[0] +=  '</button> <button id="chariot-exit" class="right btn" style=" background-color: transparent; color: #c50261; ">Skip</button>';
+      }
+      var previousButton = this.tutorial.allowSteppingBackward && this.currentStepNum() > 1 ? '<button class="btn btn-previous ' + buttonFloat + '">' + this.ctaPrevious + '</button>' : null;
+      if (previousButton) buttons.unshift(previousButton);
+      return (centered ? buttons : buttons.reverse()).join('');
     }
   }, {
     key: '_arrowMarkup',
@@ -1442,16 +1450,15 @@ var Tooltip = function () {
     }
   }, {
     key: '_animateTooltipDisappear',
-    value: function _animateTooltipDisappear($tooltip) {
-      var _this4 = this;
-
+    value: function _animateTooltipDisappear($tooltip, stepForward) {
+      var action = (stepForward ? this.next : this.previous).bind(this);
       if (!this.tutorial.animateTooltips) {
-        this.next();
+        action();
         return;
       }
 
       $tooltip.addClass(this.appearAnimationClass).css({ 'animation-direction': 'reverse' }).on('animationend', function () {
-        _this4.next();
+        action();
       });
     }
   }, {
@@ -1471,6 +1478,11 @@ var Tooltip = function () {
         console.log("Anchor element not found: " + this.anchorElement);
       }
       return $element;
+    }
+  }, {
+    key: 'previous',
+    value: function previous() {
+      this.step.previous();
     }
   }, {
     key: 'next',
@@ -1564,7 +1576,7 @@ var Tutorial = function () {
    *  <p><code>useTransparentOverlayStrategy</code> focuses on an element by
    *  resizing a transparent overlay to match its dimensions and changes the
    *  borders to be colored to obscure the main UI.<p>
-     <h4>Strategy Details</h4>
+      <h4>Strategy Details</h4>
     <p>
       By default, a tutorial is displayed with a semi-transparent overlay
       that hides background content and highlights the selected element(s) for the
@@ -1584,7 +1596,7 @@ var Tutorial = function () {
         <code>z-index</code>.
       </li>
     </ol>
-     <p>Both strategies have pros & cons.</p>
+      <p>Both strategies have pros & cons.</p>
     1. Clone strategy (default)
     <p>
       <strong>Pros:</strong> It will correctly render the entire element in question,
@@ -1600,7 +1612,7 @@ var Tutorial = function () {
       In those cases, the callbacks <code>Step.beforeCallback</code> and
       <code>Step.afterCallback</code> can be used to properly restore the margin.
     </p>
-     2. Background overlay with transparent center and semi-transparent border
+      2. Background overlay with transparent center and semi-transparent border
     <p>
       <strong>Pros:</strong>: More performant than the clone strategy because styles are not being cloned.
     </p>
@@ -1611,9 +1623,10 @@ var Tutorial = function () {
       the transparent center will either reveal or occlude sections of
       the element.
     </p>
-     Note: The clone strategy is always chosen if multiple selectors are
+      Note: The clone strategy is always chosen if multiple selectors are
     specified in <code>StepConfiguration.selectors</code>.
-     * @property {boolean} [animateTooltips=true] - Enables tooltip bouncing at the
+  
+   * @property {boolean} [animateTooltips=true] - Enables tooltip bouncing at the
    *  beginning and end of each step.
    * @property {boolean} [animateScrolling=true] -
    *  <p>If the next tooltip is not completely within the client bounds, this
@@ -1623,6 +1636,7 @@ var Tutorial = function () {
    * @property {integer} [scrollAnimationDuration=500] - Specifies the duration
    *  of the scroll animation above, in milliseconds.
    *  Ignored if <code>animateScrolling</code> is false.
+   * @property {boolean} [allowSteppingBackward=false] - Enables returning to previous steps.
    */
 
   /**
@@ -1650,6 +1664,7 @@ var Tutorial = function () {
       this.animateTooltips = true;
       this.animateScrolling = true;
       this.scrollAnimationDuration = DEFAULT_SCROLL_ANIMATION_DURATION;
+      this.allowSteppingBackward = false;
     } else if (configType === '[object Object]') {
       if (!Array.isArray(config.steps)) {
         throw new Error('steps must be an array.\n' + this);
@@ -1659,6 +1674,7 @@ var Tutorial = function () {
       this.animateTooltips = config.animateTooltips === undefined ? true : config.animateTooltips;
       this.animateScrolling = config.animateScrolling === undefined ? true : config.animateScrolling;
       this.scrollAnimationDuration = config.scrollAnimationDuration || DEFAULT_SCROLL_ANIMATION_DURATION;
+      this.allowSteppingBackward = config.allowSteppingBackward;
       stepConfigs = config.steps;
       overlayConfig = config;
     } else {
@@ -1750,7 +1766,7 @@ var Tutorial = function () {
     key: 'next',
     value: function next(step) {
       var currentStepIndex = -1;
-      if (!step) {
+      if (step === undefined || step === null) {
         currentStepIndex = this.steps.indexOf(this.currentStep);
         if (currentStepIndex < 0) {
           throw new Error('step not found');
@@ -1765,7 +1781,7 @@ var Tutorial = function () {
       }
 
       var nextStep = void 0;
-      if (step) {
+      if (step !== undefined && step !== null) {
         if (typeof step === 'number') {
           if (step < 0 || step >= this.steps.length) {
             throw new Error('step is outside bounds of steps array (length: ' + this.steps.length + ')');
@@ -1866,189 +1882,7 @@ var Tutorial = function () {
 exports.default = Tutorial;
 module.exports = exports['default'];
 
-},{"./constants":2,"./overlay":4,"./step":5,"es6-promise":10}],9:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],10:[function(require,module,exports){
+},{"./constants":2,"./overlay":4,"./step":5,"es6-promise":9}],9:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3024,7 +2858,146 @@ process.umask = function() { return 0; };
 
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":9}],11:[function(require,module,exports){
+},{"_process":12}],10:[function(require,module,exports){
+/**
+ * lodash 3.9.1 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modern modularize exports="npm" -o ./`
+ * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <https://lodash.com/license>
+ */
+
+/** `Object#toString` result references. */
+var funcTag = '[object Function]';
+
+/** Used to detect host constructors (Safari > 5). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+/**
+ * Checks if `value` is object-like.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/** Used for native method references. */
+var objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var fnToString = Function.prototype.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  fnToString.call(hasOwnProperty).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = object == null ? undefined : object[key];
+  return isNative(value) ? value : undefined;
+}
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in older versions of Chrome and Safari which return 'function' for regexes
+  // and Safari 8 equivalents which return 'object' for typed array constructors.
+  return isObject(value) && objToString.call(value) == funcTag;
+}
+
+/**
+ * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+ * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(1);
+ * // => false
+ */
+function isObject(value) {
+  // Avoid a V8 JIT bug in Chrome 19-20.
+  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is a native function.
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function, else `false`.
+ * @example
+ *
+ * _.isNative(Array.prototype.push);
+ * // => true
+ *
+ * _.isNative(_);
+ * // => false
+ */
+function isNative(value) {
+  if (value == null) {
+    return false;
+  }
+  if (isFunction(value)) {
+    return reIsNative.test(fnToString.call(value));
+  }
+  return isObjectLike(value) && reIsHostCtor.test(value);
+}
+
+module.exports = getNative;
+
+},{}],11:[function(require,module,exports){
 /**
  * lodash 3.1.1 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -3260,144 +3233,191 @@ function isObject(value) {
 
 module.exports = debounce;
 
-},{"lodash._getnative":12}],12:[function(require,module,exports){
-/**
- * lodash 3.9.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
+},{"lodash._getnative":10}],12:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
 
-/** `Object#toString` result references. */
-var funcTag = '[object Function]';
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
 
-/** Used to detect host constructors (Safari > 5). */
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
+var cachedSetTimeout;
+var cachedClearTimeout;
 
-/**
- * Checks if `value` is object-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
 }
 
-/** Used for native method references. */
-var objectProto = Object.prototype;
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
 
-/** Used to resolve the decompiled source of functions. */
-var fnToString = Function.prototype.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objToString = objectProto.toString;
-
-/** Used to detect if a method is native. */
-var reIsNative = RegExp('^' +
-  fnToString.call(hasOwnProperty).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
-  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-);
-
-/**
- * Gets the native function at `key` of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {string} key The key of the method to get.
- * @returns {*} Returns the function if it's native, else `undefined`.
- */
-function getNative(object, key) {
-  var value = object == null ? undefined : object[key];
-  return isNative(value) ? value : undefined;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
 }
 
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction(value) {
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in older versions of Chrome and Safari which return 'function' for regexes
-  // and Safari 8 equivalents which return 'object' for typed array constructors.
-  return isObject(value) && objToString.call(value) == funcTag;
-}
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
 
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
 }
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
 
-/**
- * Checks if `value` is a native function.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a native function, else `false`.
- * @example
- *
- * _.isNative(Array.prototype.push);
- * // => true
- *
- * _.isNative(_);
- * // => false
- */
-function isNative(value) {
-  if (value == null) {
-    return false;
-  }
-  if (isFunction(value)) {
-    return reIsNative.test(fnToString.call(value));
-  }
-  return isObjectLike(value) && reIsHostCtor.test(value);
-}
+function noop() {}
 
-module.exports = getNative;
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
 
 },{}]},{},[1])(1)
 });
